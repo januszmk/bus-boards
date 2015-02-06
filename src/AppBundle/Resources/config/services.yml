@@ -1,0 +1,4 @@
+services:
+    bus_service:
+        class: AppBundle\Services\BusService
+        arguments: ["@doctrine.orm.default_entity_manager"]
