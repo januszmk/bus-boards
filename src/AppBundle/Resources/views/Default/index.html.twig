@@ -1,0 +1,39 @@
+{% extends "::base.html.twig" %}
+{% block body %}
+    <div class="container"  ng-app="Boards" ng-controller="BusBoardsController as bus">
+        <div class="col-lg-6">
+            <h1>Przystanki:</h1>
+            <form class="form-horizontal" >
+                <div class="form-group">
+                    <label for="board" class="col-sm-2 control-label">Przystanek:</label>
+                    <div class="col-sm-10">
+                        <select ng-model="currentBoard"  ng-change="change()" class="form-control" id="board" name="board">
+                            <option value="" selected></option>
+                            {% for busStop in busStops %}
+                                <option value="{{ busStop.name }}">{{ busStop.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6" ng-show="currentBoard">
+            <h1>Wybrany przystanek: {{ '{{ currentBoard }}' }}</h1>
+            <p ng-hide="entries.length">Nie znaleziono żadnych danych</p>
+            <ul ng-show="entries">
+                <li ng-repeat="entry in entries">
+                    {{ '{{ getTime(entry.stop_at) }}' }} - {{ '{{ entry.bus_line.name }}' }}
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+//            $('select').select2();
+        });
+    </script>
+{% endblock %}

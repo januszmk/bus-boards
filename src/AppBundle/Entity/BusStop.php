@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * BusStop
  *
- * @ORM\Table()
+ * @ORM\Table(name="bus_stop")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\BusStopRepository")
  */
 class BusStop
@@ -28,12 +28,6 @@ class BusStop
      */
     private $name;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updatedAt", type="datetime")
-     */
-    private $updatedAt;
 
 
     /**
@@ -69,27 +63,4 @@ class BusStop
         return $this->name;
     }
 
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     * @return BusStop
-     */
-    public function setUpdatedAt(\DateTime $updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
 }

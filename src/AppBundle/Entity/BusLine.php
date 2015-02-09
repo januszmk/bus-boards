@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * BusLine
  *
- * @ORM\Table()
+ * @ORM\Table(name="bus_line")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\BusLineRepository")
  */
 class BusLine
@@ -28,12 +28,6 @@ class BusLine
      */
     private $name;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="stopAt", type="time")
-     */
-    private $stopAt;
 
 
     /**
@@ -82,14 +76,5 @@ class BusLine
         return $this;
     }
 
-    /**
-     * Get stopAt
-     *
-     * @return \DateTime 
-     */
-    public function getStopAt()
-    {
-        return $this->stopAt;
-    }
 
 }

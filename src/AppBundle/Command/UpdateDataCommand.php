@@ -21,7 +21,7 @@ class UpdateDataCommand extends ContainerAwareCommand
     {
         $busService = $this->getContainer()->get('bus_service');
 
-//        $busService->getEntries();
+        $busService->updateEntries();
     }
 
 }
