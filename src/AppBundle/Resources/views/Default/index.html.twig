@@ -7,10 +7,17 @@
                 <div class="form-group">
                     <label for="board" class="col-sm-2 control-label">Przystanek:</label>
                     <div class="col-sm-10">
-                        <select ui-select2  ng-options="item as item for item in busBoards" ng-model="currentBoard"  ng-change="change()" class="form-control" id="board" name="board">
-                            <option value="">Wybierz przystanek</option>
+                        {#<select ui-select2  ng-options="item as item for item in busBoards" ng-model="currentBoard"  ng-change="change()" class="form-control" id="board" name="board">#}
+                            {#<option value="">Wybierz przystanek</option>#}
 
-                        </select>
+                        {#</select>#}
+
+                        <ui-select ng-model="currentBoard" allow-clear on-select="change($item, $model)">
+                            <ui-select-match placeholder="Wybierz przystanek">{{ '{{$select.selected }}' }}</ui-select-match>
+                            <ui-select-choices repeat="item in busBoards | filter: $select.search">
+                                <span>{{ '{{ item }}' }}</span>
+                            </ui-select-choices>
+                        </ui-select>
                     </div>
                 </div>
 

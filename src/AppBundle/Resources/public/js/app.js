@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module("Boards", ['ui.select2']);
+    var app = angular.module("Boards", ['ui.select']);
     app.controller("BusBoardsController", ["$scope", "$http", function($scope, $http) {
         $scope.currentBoard = null;
         $scope.entries = [];
@@ -7,7 +7,8 @@
         $http.get('/getBusStops').success(function(data) {
             $scope.busBoards = angular.fromJson(data);
         });
-        $scope.change = function() {
+        $scope.change = function(busStop, model) {
+            $scope.currentBoard = busStop;
             $scope.entries = [];
            $http.get('/getEntries?bus_stop=' + $scope.currentBoard).success(function(data) {
                 $scope.entries = angular.fromJson(data).entries;
