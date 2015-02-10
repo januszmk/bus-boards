@@ -1,7 +1,7 @@
 Bus Boards Project
 ========================
 
-System that is displaying next 5 bus departures from bus stop
+System that is displaying next 5 bus departures from bus stop in Cracow
 
 Installation:
 
