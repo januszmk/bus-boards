@@ -10,9 +10,36 @@ class DefaultControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $crawler = $client->request('GET', '/app/example');
+        $client->request('GET', '/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Homepage")')->count() > 0);
+    }
+
+    public function busStops()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/getBusStops');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('application/json', $client->getResponse()->headers->get("content-type"));
+    }
+
+    public function testBusStopEntries()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/getEntries');
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $client->request('GET', '/getEntries?bus_stop=AGH');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('application/json', $client->getResponse()->headers->get("content-type"));
+
+        $content = $client->getResponse()->getContent();
+        $this->assertTrue(preg_match("/entries/", $content) == 1);
+
+
     }
 }

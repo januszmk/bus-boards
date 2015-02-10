@@ -23,7 +23,7 @@ class DefaultController extends Controller
     /**
      * @Route("/getBusStops", name="get_bus_stops")
      */
-    public function getBusStops()
+    public function busStopsAction()
     {
         $serializer = $this->get('serializer');
 
@@ -39,10 +39,10 @@ class DefaultController extends Controller
     {
         $busStop = $request->get("bus_stop");
 
-        $serializer = $this->get('serializer');
         if (!$busStop) {
-            return new JsonResponse($serializer->serialize(array("entries" => array()), 'json'));
+            throw $this->createNotFoundException();
         }
+        $serializer = $this->get('serializer');
 
         return new JsonResponse($serializer->serialize(array("entries" => $this->get('bus_service')->getEntries($busStop)), "json"));
 
