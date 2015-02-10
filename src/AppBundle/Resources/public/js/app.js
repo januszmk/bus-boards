@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module("Boards", []);
+    var app = angular.module("Boards", ['ui.select2']);
     app.controller("BusBoardsController", ["$scope", "$http", function($scope, $http) {
         $scope.currentBoard = null;
         $scope.entries = [];

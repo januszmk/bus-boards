@@ -5,10 +5,13 @@
         <title>{% block title %}Welcome!{% endblock %}</title>
         {% block stylesheets %}
         <link href="{{ asset("bundles/app/css/bootstrap.min.css") }}" rel="stylesheet" />
+        <link href="{{ asset("bundles/app/css/select.min.css") }}" rel="stylesheet" />
         {% endblock %}
         {% block javascripts %}
+            <script type="text/javascript" src="{{ asset('bundles/app/js/jquery-1.11.2.min.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/app/js/angular.min.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/app/js/angular-resource.js') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/app/js/select.min.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/app/js/app.js') }}"></script>
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
