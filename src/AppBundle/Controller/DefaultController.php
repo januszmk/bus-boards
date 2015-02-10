@@ -16,10 +16,19 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        $busStops = $this->getDoctrine()->getRepository("AppBundle:BusStop")->findAll();
-
         return array(
-            "busStops"  =>  $busStops,
+        );
+    }
+
+    /**
+     * @Route("/getBusStops", name="get_bus_stops")
+     */
+    public function getBusStops()
+    {
+        $serializer = $this->get('serializer');
+
+        return new JsonResponse(
+            $serializer->serialize($this->get('bus_service')->getBusStops(), "json")
         );
     }
 
@@ -30,18 +39,12 @@ class DefaultController extends Controller
     {
         $busStop = $request->get("bus_stop");
 
-        $busStop = $this->getDoctrine()->getRepository("AppBundle:BusStop")->findOneBy(array("name" => $busStop));
-
         $serializer = $this->get('serializer');
-
         if (!$busStop) {
             return new JsonResponse($serializer->serialize(array("entries" => array()), 'json'));
         }
-        $busEntries = $this->getDoctrine()->getRepository("AppBundle:BusEntry")->findBusEntries($busStop);
 
-        return new JsonResponse($serializer->serialize(array("entries" => $busEntries), "json"));
-
-
+        return new JsonResponse($serializer->serialize(array("entries" => $this->get('bus_service')->getEntries($busStop)), "json"));
 
     }
 }

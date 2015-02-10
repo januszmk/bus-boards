@@ -56,6 +56,12 @@ class BusEntry
     private $busStop;
 
     /**
+     * @var string
+     * @ORM\Column(name="direction", type="string", length=255)
+     */
+    private $direction;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -142,5 +148,21 @@ class BusEntry
     public function setStopAt(\DateTime $stopAt )
     {
         $this->stopAt = $stopAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * @param string $direction
+     */
+    public function setDirection( $direction )
+    {
+        $this->direction = $direction;
     }
 }

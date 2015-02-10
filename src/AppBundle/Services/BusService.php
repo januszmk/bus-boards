@@ -18,35 +18,53 @@ class BusService
     }
 
     /**
-     * update entries in database
+     * @return array list of bus stops
      */
-    public function updateEntries()
+    public function getBusStops()
     {
+        $client = new Client();
+
+        $crawler = $client->request("GET", "http://rozklady.mpk.krakow.pl/aktualne/przystan.htm");
+        $busStops = array();
+        $crawler->filter("table a")->each(function ($node) use(&$busStops) {
+            if ($node->text()) {
+                $busStops[] = $node->text();
+            }
+        });
+
+        return $busStops;
+
+    }
+
+    /**
+     * @param $busStop
+     *
+     * @return array entries for bus stop
+     */
+    public function getEntries($busStop)
+    {
+
+        $bs = $this->em->getRepository("AppBundle:BusStop")->findOneBy(array("name" => $busStop));
+        //if there are cached data, still valid, return data from db
+        if ($bs && $bs->getUpdatedAt()->add(\DateInterval::createFromDateString('1 day')) > new \DateTime()) {
+            return $this->em->getRepository("AppBundle:BusEntry")->findBusEntries($bs);
+        }
+
         $client = new Client();
         //downloading main page for bus stops
         $crawler = $client->request("GET", "http://rozklady.mpk.krakow.pl/aktualne/przystan.htm");
 
-        //we store entites in here
-        $entries = array("lines"=>array(), "busStops" => array());
 
-        //deleting old data from database
         $this->em->getConnection()->beginTransaction();
-        $this->em->createQuery("DELETE FROM AppBundle:BusEntry")->execute();
-        $this->em->createQuery("DELETE FROM AppBundle:BusStop")->execute();
-        $this->em->createQuery("DELETE FROM AppBundle:BusLine")->execute();
-        $this->em->getConnection()->prepare("ALTER TABLE bus_entry AUTO_INCREMENT = 1")->execute();
-        $this->em->getConnection()->prepare("ALTER TABLE bus_stop AUTO_INCREMENT = 1")->execute();
-        $this->em->getConnection()->prepare("ALTER TABLE bus_line AUTO_INCREMENT = 1")->execute();
-        $count = 0;
+        if ($bs) {
+            //deleting old data from database
+            $this->em->createQuery("DELETE FROM AppBundle:BusEntry be WHERE be.busStop = :busStop")->execute(array("busStop" => $bs));
+            $this->em->getConnection()->prepare("ALTER TABLE bus_entry AUTO_INCREMENT = 1")->execute();
+        }
         //iterating bus stops
-        $crawler->filter("table a")->each(function ($node) use(&$count, &$entries, $client) {
-            if ($node->text()) {
-                if ($count >= 20) {
-                    return;
-                }
-//                echo $count . "\n";
-                $count++;
-                $busStopName = $node->text();
+        $crawler->filter("table a")->each(function ($node) use($bs, $busStop, $client) {
+            if ($node->text() == $busStop) {
+
                 $crawler = $client->click($node->link());
                 $lines = array();
                 $crawler->filter("a")->each(function ($node) use(&$lines, $client) {
@@ -98,28 +116,37 @@ class BusService
                     }
 
                 });
+                $busLines = array();
                 foreach ($lines as $line => $values) {
-                    if (!isset($entries["lines"][$line])) {
-                        $busLine = new BusLine();
-                        $busLine->setName($line);
-                        $this->em->persist($busLine);
-                        $entries["lines"][$line] = $busLine;
+                    $lineParts = explode("- >", $line);
+
+                    $lineName = $lineParts[0];
+                    if (!isset($busLines[$lineName])) {
+                        $busLine = $this->em->getRepository("AppBundle:BusLine")->findOneBy(array("name" => $lineName));
+                        if (!$busLine) {
+                            $busLine = new BusLine();
+                            $busLine->setName($lineName);
+                            $this->em->persist($busLine);
+                        }
+                        $busLines[$lineName] = $busLine;
                     }
-                    if (!isset($entries['busStops'][$busStopName])) {
-                        $busStop = new BusStop();
-                        $busStop->setName($busStopName);
-                        $this->em->persist($busStop);
-                        $entries['busStops'][$busStopName] = $busStop;
+                    if (!$bs) {
+                        $bs = new BusStop();
+                        $bs->setName($busStop);
+                        $this->em->persist($bs);
                     }
+                    $bs->setUpdatedAt(new \DateTime());
                     foreach ($values as $type => $hours) {
                         foreach ($hours as $hr => $minutes) {
                             if (!$minutes) {
                                 continue;
                             }
+                            //add data into db
                             foreach ($minutes as $min) {
                                 $busEntry = new BusEntry();
-                                $busEntry->setBusStop($entries['busStops'][$busStopName]);
-                                $busEntry->setBusLine($entries["lines"][$line]);
+                                $busEntry->setBusStop($bs);
+                                $busEntry->setBusLine($busLines[$lineName]);
+                                $busEntry->setDirection(trim($lineParts[1]));
                                 $stopAt = \DateTime::createFromFormat("H:i", $hr.":".preg_replace("/([a-zA-Z]*)/", "", $min));
                                 $busEntry->setStopAt($stopAt);
                                 $busEntry->setType($type);
@@ -129,11 +156,14 @@ class BusService
                     }
                 }
             }
-
-
         });
         $this->em->flush();
         $this->em->getConnection()->commit();
+        if (!$bs) {
+            $bs = $this->em->getRepository("AppBundle:BusStop")->findOneBy(array("name" => $busStop));
+        }
+        //return new data from db
+        return $this->em->getRepository("AppBundle:BusEntry")->findBusEntries($bs);
 
     }
 }

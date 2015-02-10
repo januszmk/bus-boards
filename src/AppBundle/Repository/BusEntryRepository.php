@@ -25,13 +25,13 @@ class BusEntryRepository extends EntityRepository
             $type = BusEntry::TYPE_NORMAL;
         }
         return $this->createQueryBuilder("be")
-            ->where("unix_timestamp(be.stopAt) - unix_timestamp(CURRENT_TIMESTAMP()) > 0")
-            ->andWhere("unix_timestamp(be.stopAt) - unix_timestamp(CURRENT_TIMESTAMP()) <= 300")
             ->andWhere("be.busStop = :busStop")
             ->andWhere('be.type = :type')
+            ->andWhere("be.stopAt > CURRENT_TIMESTAMP()")
             ->setParameter("busStop", $busStop)
             ->setParameter("type", $type)
             ->orderBy("be.stopAt", "ASC")
+            ->setMaxResults(5)
             ->getQuery()->getResult();
 
     }

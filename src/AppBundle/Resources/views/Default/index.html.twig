@@ -7,11 +7,9 @@
                 <div class="form-group">
                     <label for="board" class="col-sm-2 control-label">Przystanek:</label>
                     <div class="col-sm-10">
-                        <select ng-model="currentBoard"  ng-change="change()" class="form-control" id="board" name="board">
-                            <option value="" selected></option>
-                            {% for busStop in busStops %}
-                                <option value="{{ busStop.name }}">{{ busStop.name }}</option>
-                            {% endfor %}
+                        <select ng-options="item as item for item in busBoards" ng-model="currentBoard"  ng-change="change()" class="form-control" id="board" name="board">
+                            <option value="">Wybierz przystanek</option>
+
                         </select>
                     </div>
                 </div>
@@ -20,20 +18,12 @@
         </div>
         <div class="col-lg-6" ng-show="currentBoard">
             <h1>Wybrany przystanek: {{ '{{ currentBoard }}' }}</h1>
-            <p ng-hide="entries.length">Nie znaleziono żadnych danych</p>
+            <p ng-hide="entries.length">Ładowanie danych...</p>
             <ul ng-show="entries">
                 <li ng-repeat="entry in entries">
-                    {{ '{{ getTime(entry.stop_at) }}' }} - {{ '{{ entry.bus_line.name }}' }}
+                     {{ '{{ entry.bus_line.name }}' }} | {{ '{{ entry.direction }}' }} | {{ 'za {{ getTime(entry.stop_at) }} minut' }}
                 </li>
             </ul>
         </div>
     </div>
-{% endblock %}
-{% block javascripts %}
-    {{ parent() }}
-    <script type="text/javascript">
-        $(document).ready(function() {
-//            $('select').select2();
-        });
-    </script>
 {% endblock %}
