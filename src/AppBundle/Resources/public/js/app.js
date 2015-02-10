@@ -15,9 +15,10 @@
            });
         };
         $scope.getTime = function(date) {
-            var date = new Date(date);
-            var now = new Date();
-            return Math.round((((date - now) % 86400000) % 3600000) / 60000)
+            var date = new Date(date).getTime();
+            var now = new Date().getTime();
+            var difference = date - now;
+            return Math.floor(difference / 60000);
         }
     }]);
 })();
