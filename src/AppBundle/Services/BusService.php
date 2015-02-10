@@ -77,7 +77,7 @@ class BusService
                     $uriParts[count($uriParts) - 1] = str_replace("r","t", $uriParts[count($uriParts) - 1]);
                     $crawler = $client->request("GET", implode("/", $uriParts));
                     preg_match_all("/fonthour\">([0-9]+).*\n.*fontmin\">([^<]+)/", $crawler->html(), $matches);
-                    $hours = array('normal' => array(), 'saturday' => array(), 'sunday' => array(),);
+                    $hours = array(BusEntry::TYPE_NORMAL => array(), BusEntry::TYPE_SATURDAY => array(), BusEntry::TYPE_SUNDAY => array(),);
                     foreach ($matches[1] as $key => $match) {
                         if (trim($matches[2][$key]) == "-") {
                             $minutes = array();
